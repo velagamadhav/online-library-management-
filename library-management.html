@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Online Library Management System</title>
+<style>
+  :root{
+    --bg:#f6f5f1;
+    --card:#ffffff;
+    --ink:#26291f;
+    --muted:#6b6f61;
+    --line:#dedbd0;
+    --accent:#3f6b4c;
+    --accent-light:#e7efe8;
+    --danger:#a0433a;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#1c1e18;
+      --card:#25281f;
+      --ink:#eceae1;
+      --muted:#a2a691;
+      --line:#3a3d31;
+      --accent:#7fb894;
+      --accent-light:#2c3627;
+      --danger:#e17a70;
+    }
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:Georgia,'Times New Roman',serif;
+    background:var(--bg);
+    color:var(--ink);
+    padding-top:env(safe-area-inset-top,0px);
+    padding-bottom:env(safe-area-inset-bottom,0px);
+  }
+  header{
+    padding:28px 20px 18px;
+    border-bottom:2px solid var(--line);
+    text-align:center;
+  }
+  header h1{
+    margin:0 0 6px;
+    font-size:1.7rem;
+    letter-spacing:0.3px;
+  }
+  header p{
+    margin:0;
+    color:var(--muted);
+    font-size:0.95rem;
+  }
+  main{
+    max-width:820px;
+    margin:0 auto;
+    padding:24px 16px 60px;
+  }
+  .panel{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:6px;
+    padding:20px;
+    margin-bottom:22px;
+  }
+  .panel h2{
+    margin:0 0 14px;
+    font-size:1.1rem;
+    border-bottom:1px solid var(--line);
+    padding-bottom:8px;
+  }
+  form.add-form{
+    display:grid;
+    grid-template-columns:2fr 1.4fr 1fr;
+    gap:10px;
+  }
+  @media (max-width:560px){
+    form.add-form{grid-template-columns:1fr;}
+  }
+  input, select{
+    font-family:inherit;
+    font-size:0.95rem;
+    padding:9px 10px;
+    border:1px solid var(--line);
+    border-radius:4px;
+    background:var(--bg);
+    color:var(--ink);
+  }
+  input:focus, select:focus{
+    outline:2px solid var(--accent);
+    outline-offset:1px;
+  }
+  button{
+    font-family:inherit;
+    font-size:0.9rem;
+    padding:9px 14px;
+    border-radius:4px;
+    border:1px solid var(--accent);
+    background:var(--accent);
+    color:#fff;
+    cursor:pointer;
+  }
+  button.secondary{
+    background:transparent;
+    color:var(--accent);
+  }
+  button.danger{
+    background:transparent;
+    color:var(--danger);
+    border-color:var(--danger);
+  }
+  button:hover{filter:brightness(0.95);}
+  .search-row{
+    display:flex;
+    gap:10px;
+    margin-bottom:16px;
+  }
+  .search-row input{flex:1;}
+  table{
+    width:100%;
+    border-collapse:collapse;
+    font-size:0.92rem;
+  }
+  th, td{
+    text-align:left;
+    padding:10px 8px;
+    border-bottom:1px solid var(--line);
+  }
+  th{
+    color:var(--muted);
+    font-weight:normal;
+    font-size:0.82rem;
+    text-transform:uppercase;
+    letter-spacing:0.5px;
+  }
+  tr:last-child td{border-bottom:none;}
+  .status{
+    padding:2px 9px;
+    border-radius:20px;
+    font-size:0.78rem;
+    white-space:nowrap;
+  }
+  .status.available{background:var(--accent-light);color:var(--accent);}
+  .status.borrowed{background:#f0e4d8;color:#8a5a2b;}
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]) .status.borrowed{background:#3a3324;color:#e0b884;}
+  }
+  .actions{display:flex;gap:6px;flex-wrap:wrap;}
+  .actions button{padding:5px 10px;font-size:0.8rem;}
+  .empty{
+    text-align:center;
+    color:var(--muted);
+    padding:30px 10px;
+  }
+  .stats{
+    display:flex;
+    gap:16px;
+    flex-wrap:wrap;
+    margin-bottom:18px;
+  }
+  .stat{
+    flex:1;
+    min-width:120px;
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:6px;
+    padding:14px;
+    text-align:center;
+  }
+  .stat .num{font-size:1.5rem;font-weight:bold;}
+  .stat .label{color:var(--muted);font-size:0.8rem;}
+  footer{
+    text-align:center;
+    color:var(--muted);
+    font-size:0.8rem;
+    padding:20px;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Online Library Management System</h1>
+  <p>Search, borrow and return books — a simple student mini-project</p>
+</header>
+
+<main>
+
+  <div class="stats" id="stats"></div>
+
+  <div class="panel">
+    <h2>Add a Book</h2>
+    <form class="add-form" id="addForm">
+      <input type="text" id="titleInput" placeholder="Book title" required>
+      <input type="text" id="authorInput" placeholder="Author" required>
+      <button type="submit">Add Book</button>
+    </form>
+  </div>
+
+  <div class="panel">
+    <h2>Library Catalog</h2>
+    <div class="search-row">
+      <input type="text" id="searchInput" placeholder="Search by title or author...">
+      <select id="filterSelect">
+        <option value="all">All</option>
+        <option value="available">Available</option>
+        <option value="borrowed">Borrowed</option>
+      </select>
+    </div>
+    <div id="tableWrap"></div>
+  </div>
+
+</main>
+
+<footer>Data is stored only in this browser tab session.</footer>
+
+<script>
+let books = [
+  {id:1, title:"The Alchemist", author:"Paulo Coelho", status:"available", borrower:""},
+  {id:2, title:"Clean Code", author:"Robert C. Martin", status:"borrowed", borrower:"Ravi"},
+  {id:3, title:"A Brief History of Time", author:"Stephen Hawking", status:"available", borrower:""},
+];
+let nextId = 4;
+
+const tableWrap = document.getElementById('tableWrap');
+const statsEl = document.getElementById('stats');
+const searchInput = document.getElementById('searchInput');
+const filterSelect = document.getElementById('filterSelect');
+
+function renderStats(){
+  const total = books.length;
+  const available = books.filter(b=>b.status==='available').length;
+  const borrowed = total - available;
+  statsEl.innerHTML = `
+    <div class="stat"><div class="num">${total}</div><div class="label">Total Books</div></div>
+    <div class="stat"><div class="num">${available}</div><div class="label">Available</div></div>
+    <div class="stat"><div class="num">${borrowed}</div><div class="label">Borrowed</div></div>
+  `;
+}
+
+function renderTable(){
+  const q = searchInput.value.trim().toLowerCase();
+  const filter = filterSelect.value;
+  let rows = books.filter(b=>{
+    const matchesQuery = !q || b.title.toLowerCase().includes(q) || b.author.toLowerCase().includes(q);
+    const matchesFilter = filter==='all' || b.status===filter;
+    return matchesQuery && matchesFilter;
+  });
+
+  if(rows.length===0){
+    tableWrap.innerHTML = `<div class="empty">No books match your search.</div>`;
+    return;
+  }
+
+  let html = `<table><thead><tr>
+    <th>Title</th><th>Author</th><th>Status</th><th>Actions</th>
+  </tr></thead><tbody>`;
+
+  rows.forEach(b=>{
+    html += `<tr>
+      <td>${escapeHtml(b.title)}</td>
+      <td>${escapeHtml(b.author)}</td>
+      <td><span class="status ${b.status}">${b.status==='available' ? 'Available' : 'Borrowed'}</span></td>
+      <td class="actions">
+        ${b.status==='available'
+          ? `<button onclick="borrowBook(${b.id})">Borrow</button>`
+          : `<button class="secondary" onclick="returnBook(${b.id})">Return</button>`}
+        <button class="danger" onclick="removeBook(${b.id})">Delete</button>
+      </td>
+    </tr>`;
+  });
+
+  html += `</tbody></table>`;
+  tableWrap.innerHTML = html;
+}
+
+function escapeHtml(str){
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+function borrowBook(id){
+  const name = prompt("Borrower's name:");
+  if(!name) return;
+  const book = books.find(b=>b.id===id);
+  book.status = 'borrowed';
+  book.borrower = name;
+  renderAll();
+}
+
+function returnBook(id){
+  const book = books.find(b=>b.id===id);
+  book.status = 'available';
+  book.borrower = '';
+  renderAll();
+}
+
+function removeBook(id){
+  books = books.filter(b=>b.id!==id);
+  renderAll();
+}
+
+function renderAll(){
+  renderStats();
+  renderTable();
+}
+
+document.getElementById('addForm').addEventListener('submit', function(e){
+  e.preventDefault();
+  const title = document.getElementById('titleInput').value.trim();
+  const author = document.getElementById('authorInput').value.trim();
+  if(!title || !author) return;
+  books.push({id: nextId++, title, author, status:'available', borrower:''});
+  document.getElementById('titleInput').value = '';
+  document.getElementById('authorInput').value = '';
+  renderAll();
+});
+
+searchInput.addEventListener('input', renderTable);
+filterSelect.addEventListener('change', renderTable);
+
+renderAll();
+</script>
+
+</body>
+</html>
