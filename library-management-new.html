@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Online Library Management System</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@600;700&display=swap');
+
+:root {
+  --bg: #f4f1ea;
+  --card: #ffffff;
+  --ink: #1f2a22;
+  --muted: #6f7568;
+  --line: #e4dfd2;
+  --accent: #2f5d46;
+  --accent-soft: #e4efe8;
+  --gold: #c8963e;
+  --gold-soft: #f8ecd6;
+  --danger: #b2463c;
+  --shadow: 0 1px 2px rgba(31, 42, 34, 0.06), 0 8px 24px rgba(31, 42, 34, 0.06);
+  --shadow-hover: 0 4px 10px rgba(31, 42, 34, 0.1), 0 16px 32px rgba(31, 42, 34, 0.1);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #14170f;
+    --card: #1e231a;
+    --ink: #eeeadd;
+    --muted: #a0a692;
+    --line: #333929;
+    --accent: #7fbf98;
+    --accent-soft: #24332a;
+    --gold: #e0b35f;
+    --gold-soft: #3a3120;
+    --danger: #ea7f74;
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 24px rgba(0, 0, 0, 0.25);
+    --shadow-hover: 0 4px 10px rgba(0, 0, 0, 0.4), 0 16px 32px rgba(0, 0, 0, 0.35);
+  }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: 'Inter', system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  line-height: 1.5;
+}
+
+/* ---------- Hero ---------- */
+.hero {
+  background:
+    radial-gradient(circle at 85% 20%, rgba(200, 150, 62, 0.35), transparent 45%),
+    linear-gradient(135deg, #1f4332 0%, #2f5d46 60%, #3e7558 100%);
+  color: #fff;
+  text-align: center;
+  padding: 56px 20px 110px;
+}
+.hero .badge {
+  display: inline-block;
+  font-size: 0.75rem;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  background: rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  padding: 5px 14px;
+  border-radius: 999px;
+  margin-bottom: 16px;
+}
+.hero h1 {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: clamp(1.9rem, 5vw, 2.9rem);
+  margin: 0 0 10px;
+  line-height: 1.15;
+}
+.hero p {
+  margin: 0 auto;
+  max-width: 520px;
+  color: rgba(255, 255, 255, 0.82);
+  font-size: 1rem;
+}
+
+main {
+  max-width: 980px;
+  margin: -70px auto 0;
+  padding: 0 16px 50px;
+}
+
+/* ---------- Stats ---------- */
+.stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  margin-bottom: 22px;
+}
+.stat {
+  background: var(--card);
+  border-radius: 14px;
+  padding: 18px;
+  box-shadow: var(--shadow);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.stat .icon {
+  width: 46px;
+  height: 46px;
+  border-radius: 12px;
+  display: grid;
+  place-items: center;
+  font-size: 1.3rem;
+  background: var(--accent-soft);
+}
+.stat.gold .icon { background: var(--gold-soft); }
+.stat .num { font-size: 1.7rem; font-weight: 600; line-height: 1; }
+.stat .label { color: var(--muted); font-size: 0.8rem; margin-top: 4px; }
+
+/* ---------- Panels ---------- */
+.panel {
+  background: var(--card);
+  border-radius: 16px;
+  padding: 24px;
+  margin-bottom: 22px;
+  box-shadow: var(--shadow);
+}
+.panel h2 {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 1.3rem;
+  margin: 0 0 16px;
+}
+
+/* ---------- Form controls ---------- */
+.add-form {
+  display: grid;
+  grid-template-columns: 2fr 1.4fr auto;
+  gap: 10px;
+}
+input {
+  font-family: inherit;
+  font-size: 0.95rem;
+  padding: 11px 14px;
+  border: 1.5px solid var(--line);
+  border-radius: 10px;
+  background: var(--bg);
+  color: var(--ink);
+  transition: border-color 0.15s, box-shadow 0.15s;
+  width: 100%;
+}
+input::placeholder { color: var(--muted); }
+input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+button {
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 500;
+  padding: 11px 20px;
+  border-radius: 10px;
+  border: 1.5px solid var(--accent);
+  background: var(--accent);
+  color: #fff;
+  cursor: pointer;
+  transition: transform 0.12s, filter 0.15s, background 0.15s;
+}
+button:hover { filter: brightness(1.1); }
+button:active { transform: scale(0.97); }
+button.secondary { background: transparent; color: var(--accent); }
+button.danger {
+  background: transparent;
+  color: var(--danger);
+  border-color: var(--line);
+}
+button.danger:hover { border-color: var(--danger); }
+
+/* ---------- Toolbar ---------- */
+.toolbar {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-bottom: 20px;
+}
+.search-box { position: relative; flex: 1; min-width: 220px; }
+.search-box svg {
+  position: absolute;
+  left: 13px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--muted);
+}
+.search-box input { padding-left: 40px; }
+
+.chips { display: flex; gap: 8px; flex-wrap: wrap; }
+.chip {
+  background: transparent;
+  color: var(--muted);
+  border: 1.5px solid var(--line);
+  border-radius: 999px;
+  padding: 8px 16px;
+  font-size: 0.85rem;
+}
+.chip:hover { color: var(--ink); filter: none; }
+.chip.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+/* ---------- Book cards ---------- */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+  gap: 16px;
+}
+.book {
+  display: flex;
+  gap: 14px;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--card);
+  transition: transform 0.18s, box-shadow 0.18s;
+}
+.book:hover { transform: translateY(-3px); box-shadow: var(--shadow-hover); }
+
+.cover {
+  flex: 0 0 66px;
+  height: 92px;
+  border-radius: 4px 8px 8px 4px;
+  display: grid;
+  place-items: center;
+  color: #fff;
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 1.9rem;
+  font-weight: 700;
+  box-shadow: inset 5px 0 0 rgba(0, 0, 0, 0.18), 3px 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.info { display: flex; flex-direction: column; min-width: 0; flex: 1; }
+.info h3 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.25;
+}
+.info .author { color: var(--muted); font-size: 0.85rem; margin: 2px 0 8px; }
+
+.status {
+  align-self: flex-start;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+.status.available { background: var(--accent-soft); color: var(--accent); }
+.status.borrowed { background: var(--gold-soft); color: var(--gold); }
+.borrower { font-size: 0.78rem; color: var(--muted); margin-top: 6px; }
+
+.actions { display: flex; gap: 6px; margin-top: auto; padding-top: 12px; }
+.actions button { padding: 6px 12px; font-size: 0.8rem; }
+
+/* ---------- Empty state ---------- */
+.empty {
+  text-align: center;
+  color: var(--muted);
+  padding: 40px 10px;
+}
+.empty .big { font-size: 2.4rem; margin-bottom: 6px; }
+
+footer {
+  text-align: center;
+  color: var(--muted);
+  font-size: 0.8rem;
+  padding: 10px 20px 30px;
+}
+
+/* ---------- Mobile ---------- */
+@media (max-width: 640px) {
+  .stats { grid-template-columns: 1fr; }
+  .add-form { grid-template-columns: 1fr; }
+  .hero { padding-bottom: 100px; }
+}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <span class="badge">Library Portal</span>
+  <h1>Online Library Management System</h1>
+  <p>Search, borrow and return books, all in one place.</p>
+</header>
+
+<main>
+  <div class="stats" id="stats"></div>
+
+  <section class="panel">
+    <h2>Add a Book</h2>
+    <form class="add-form" id="addForm">
+      <input type="text" id="titleInput" placeholder="Book title" required>
+      <input type="text" id="authorInput" placeholder="Author" required>
+      <button type="submit">+ Add Book</button>
+    </form>
+  </section>
+
+  <section class="panel">
+    <h2>Library Catalog</h2>
+    <div class="toolbar">
+      <div class="search-box">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <circle cx="11" cy="11" r="7"></circle>
+          <path d="M20 20l-3.5-3.5"></path>
+        </svg>
+        <input type="text" id="searchInput" placeholder="Search by title or author...">
+      </div>
+      <div class="chips" id="chips"></div>
+    </div>
+    <div id="catalog"></div>
+  </section>
+</main>
+
+<footer>Data is stored only in this browser tab session.</footer>
+
+<script>
+let books = [
+  { id: 1, title: "The Alchemist", author: "Paulo Coelho", status: "available", borrower: "" },
+  { id: 2, title: "Clean Code", author: "Robert C. Martin", status: "borrowed", borrower: "Ravi" },
+  { id: 3, title: "A Brief History of Time", author: "Stephen Hawking", status: "available", borrower: "" }
+];
+let nextId = 4;
+let search = "";
+let filter = "all";
+
+const coverColors = [
+  ["#2f5d46", "#5b9a78"],
+  ["#8a4b2a", "#c9854f"],
+  ["#2d4a7a", "#5f87c4"],
+  ["#6b2f5c", "#b0689c"],
+  ["#7a6a1f", "#c4b04a"],
+  ["#334155", "#64748b"]
+];
+
+const statsEl = document.getElementById("stats");
+const chipsEl = document.getElementById("chips");
+const catalogEl = document.getElementById("catalog");
+const searchInput = document.getElementById("searchInput");
+
+function escapeHtml(str) {
+  const div = document.createElement("div");
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+function counts() {
+  const total = books.length;
+  const available = books.filter(b => b.status === "available").length;
+  return { total, available, borrowed: total - available };
+}
+
+function renderStats() {
+  const { total, available, borrowed } = counts();
+  statsEl.innerHTML = `
+    <div class="stat">
+      <div class="icon">📚</div>
+      <div><div class="num">${total}</div><div class="label">Total Books</div></div>
+    </div>
+    <div class="stat">
+      <div class="icon">✅</div>
+      <div><div class="num">${available}</div><div class="label">Available</div></div>
+    </div>
+    <div class="stat gold">
+      <div class="icon">📖</div>
+      <div><div class="num">${borrowed}</div><div class="label">Borrowed</div></div>
+    </div>
+  `;
+}
+
+function renderChips() {
+  const { total, available, borrowed } = counts();
+  const list = [
+    { key: "all", label: `All (${total})` },
+    { key: "available", label: `Available (${available})` },
+    { key: "borrowed", label: `Borrowed (${borrowed})` }
+  ];
+  chipsEl.innerHTML = list.map(f =>
+    `<button class="chip ${filter === f.key ? "active" : ""}" data-filter="${f.key}">${f.label}</button>`
+  ).join("");
+}
+
+function renderCatalog() {
+  const q = search.trim().toLowerCase();
+  const visible = books.filter(b => {
+    const matchesQuery = !q || b.title.toLowerCase().includes(q) || b.author.toLowerCase().includes(q);
+    const matchesFilter = filter === "all" || b.status === filter;
+    return matchesQuery && matchesFilter;
+  });
+
+  if (visible.length === 0) {
+    catalogEl.innerHTML = `<div class="empty"><div class="big">🔍</div>No books match your search.</div>`;
+    return;
+  }
+
+  catalogEl.innerHTML = `<div class="grid">` + visible.map(b => {
+    const [c1, c2] = coverColors[b.id % coverColors.length];
+    const isAvailable = b.status === "available";
+    return `
+      <article class="book">
+        <div class="cover" style="background: linear-gradient(145deg, ${c1}, ${c2})">
+          ${escapeHtml(b.title.charAt(0).toUpperCase())}
+        </div>
+        <div class="info">
+          <h3>${escapeHtml(b.title)}</h3>
+          <div class="author">by ${escapeHtml(b.author)}</div>
+          <span class="status ${b.status}">${isAvailable ? "Available" : "Borrowed"}</span>
+          ${isAvailable ? "" : `<div class="borrower">Borrowed by ${escapeHtml(b.borrower)}</div>`}
+          <div class="actions">
+            ${isAvailable
+              ? `<button data-action="borrow" data-id="${b.id}">Borrow</button>`
+              : `<button class="secondary" data-action="return" data-id="${b.id}">Return</button>`}
+            <button class="danger" data-action="delete" data-id="${b.id}">Delete</button>
+          </div>
+        </div>
+      </article>`;
+  }).join("") + `</div>`;
+}
+
+function renderAll() {
+  renderStats();
+  renderChips();
+  renderCatalog();
+}
+
+/* ---------- Events ---------- */
+document.getElementById("addForm").addEventListener("submit", function (e) {
+  e.preventDefault();
+  const titleEl = document.getElementById("titleInput");
+  const authorEl = document.getElementById("authorInput");
+  const title = titleEl.value.trim();
+  const author = authorEl.value.trim();
+  if (!title || !author) return;
+  books.push({ id: nextId++, title, author, status: "available", borrower: "" });
+  titleEl.value = "";
+  authorEl.value = "";
+  renderAll();
+});
+
+searchInput.addEventListener("input", function () {
+  search = searchInput.value;
+  renderCatalog();
+});
+
+chipsEl.addEventListener("click", function (e) {
+  const btn = e.target.closest("[data-filter]");
+  if (!btn) return;
+  filter = btn.dataset.filter;
+  renderChips();
+  renderCatalog();
+});
+
+catalogEl.addEventListener("click", function (e) {
+  const btn = e.target.closest("[data-action]");
+  if (!btn) return;
+  const id = Number(btn.dataset.id);
+  const book = books.find(b => b.id === id);
+  if (!book) return;
+
+  if (btn.dataset.action === "borrow") {
+    const name = prompt("Borrower's name:");
+    if (!name || !name.trim()) return;
+    book.status = "borrowed";
+    book.borrower = name.trim();
+  } else if (btn.dataset.action === "return") {
+    book.status = "available";
+    book.borrower = "";
+  } else if (btn.dataset.action === "delete") {
+    books = books.filter(b => b.id !== id);
+  }
+  renderAll();
+});
+
+renderAll();
+</script>
+
+</body>
+</html>
